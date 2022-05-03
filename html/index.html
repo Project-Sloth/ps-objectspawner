@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta id="viewport" name="viewport" content ="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" type="text/css" href="styles.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/quasar@2.1.0/dist/quasar.prod.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet" type="text/css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/quasar@2.1.0/dist/quasar.umd.prod.js" defer></script>
+    <script src="app.js" defer></script>
+
+  </head>
+
+  <body style="background:rgb(0,0,0,0.0)">
+    <div class="container">
+        <div class="right-menu">
+            <q-item>
+                <q-item-section>
+                    <q-select 
+                        outlined 
+                        dense 
+                        use-input 
+                        input-debounce="0" 
+                        label="Objects" 
+                        label-color="white" 
+                        color="info"
+                        @update:model-value="UpdateObject($event)"
+                        v-model="model" 
+                        :options="objectOptions" 
+                        @filter="filterFn"
+                    >
+                        <template v-slot:no-option>
+                            <q-item>
+                                <q-item-section class="text-white">No results</q-item-section>
+                            </q-item>
+                        </template>
+                    </q-select>
+                </q-item-section>
+            </q-item>
+            <q-item>
+                <q-item-section>
+                    <q-btn color="info" text-color="white" label="Spawn Object" v-on:click="SpawnObject()" />
+                </q-item-section>
+            </q-item>
+        </div>
+    </div>
+  </body>
+</html>
