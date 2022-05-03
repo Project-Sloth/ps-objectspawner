@@ -13,11 +13,7 @@ RegisterNetEvent("objects:CreateNewObject", function(model, coords)
 end)
 
 function CreateDataObject(mode, coords, type, options)
-    if model and coords and type and options then 
-
-    else 
-
-    end
+    MySQL.query.await("INSERT INTO objects (model, coords, type, options) VALUES (?, ?, ?, ?)", { model, json.encode(coords), type, json.encode(options) })
 end
 exports("CreateDataObject", CreateDataObject)
 
