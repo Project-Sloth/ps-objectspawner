@@ -1,4 +1,4 @@
-local QBCore = exports["urp-core"]:GetCoreObject()
+local QBCore = exports["qb-core"]:GetCoreObject()
 local ServerObjects = {}
 
 RegisterNetEvent("objects:CreateNewObject", function(model, coords)
