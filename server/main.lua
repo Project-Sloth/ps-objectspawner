@@ -12,7 +12,14 @@ RegisterNetEvent("objects:CreateNewObject", function(model, coords)
     end
 end)
 
+function CreateDataObject(mode, coords, type, options)
+    if model and coords and type and options then 
 
+    else 
+
+    end
+end
+exports("CreateDataObject", CreateDataObject)
 
 CreateThread(function()
     ServerObjects = MySQL.query.await('SELECT * FROM objects', {})

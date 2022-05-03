@@ -32,7 +32,7 @@ const menu = {
             this.CurrentObject = object
         },
         SpawnObject: function() {
-            $.post('https://devyn-objectspawner/spawn', JSON.stringify({object: this.CurrentObject }));
+            $.post(`https://GetCurrentResourceName()/spawn`, JSON.stringify({object: this.CurrentObject }));
         },
         UpdateObjectList: function(ObjectList) {
             ObjectList = ObjectList
@@ -71,5 +71,5 @@ document.onkeyup = function (data) {
   
 function closeMenu() {
     $(".container").fadeOut(150);
-    $.post('https://devyn-objectspawner/close');
+    $.post(`https://GetCurrentResourceName()/close`);
 }
