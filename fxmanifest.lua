@@ -1,7 +1,11 @@
 fx_version 'cerulean'
-games { 'gta5' }
+game 'gta5'
 
-author 'devyn'
+author 'Project Sloth team'
+description 'Object Spawner'
+version '0.0.1'
+
+lua54 'yes'
 
 client_scripts { "client/*.lua" }
 server_scripts {
@@ -14,6 +18,3 @@ ui_page "html/index.html"
 files({
 	"html/*",
 })
-
-
-lua54 'yes'

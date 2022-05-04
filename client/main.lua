@@ -34,7 +34,7 @@ RegisterCommand('+ToggleRotationMode', function()
     elseif CurrentDirection == "z" then 
         CurrentDirection = "x"
     end
-    print(CurrentDirection)
+    --print(CurrentDirection)
 end)
 RegisterKeyMapping("+ToggleRotationMode", "Toggle Rotation Mode", "keyboard", "")
 
@@ -47,7 +47,6 @@ function openMenu()
         SendNUIMessage({ action = "load", objects = Objects })
     end
 end
-
 
 RegisterNUICallback('close', function()
     SetNuiFocus(false, false)
@@ -109,20 +108,31 @@ function CreateSpawnedObject(object)
     FreezeEntityPosition(CurrentObject, true)
 
     CreateThread(function()
+        form = setupScaleform("instructional_buttons")
         while PlacingObject do
             local hit, coords, entity = RayCastGamePlayCamera(1000.0)
             CurrentCoords = coords
+
+            DrawScaleformMovieFullscreen(form, 255, 255, 255, 255, 0)
+
             if hit then
                 SetEntityCoords(CurrentObject, coords.x, coords.y, coords.z)
                 PlaceObjectOnGroundProperly(CurrentObject)
             end
-            Wait(5)
+            
+            if IsControlJustPressed(0, 38) then
+                PlaceSpawnedObject()
+            end
+            
+            Wait(1)
         end
     end)
 end
 
 function PlaceSpawnedObject()
-    TriggerServerEvent("objects:CreateNewObject", CurrentModel, CurrentCoords)
+    local ObjectType = 'prop' --will be replaced with inputted prop type later, which will determine options/events
+    local Options = { event = "qb-test:client:test", icon = "fas fa-question", label = "TEST", SpawnRange = 100} --will be replaced with config of options later
+    TriggerServerEvent("objects:CreateNewObject", CurrentModel, CurrentCoords, ObjectType, Options)
     DeleteObject(CurrentObject)
     PlacingObject = false
     CurrentObject = nil
@@ -183,6 +193,21 @@ CreateThread(function()
                     Wait(50)
                     SetEntityAlpha(v["object"], i, false)
                 end
+
+                if data.event and data.icon and data.label then
+                    exports['qb-target']:AddTargetEntity(object, {
+                        --debugPoly=true,
+                        options = {
+                            {
+                                name = "object_spawner_"..object, 
+                                event = data.event,
+                                icon = data.icon,
+                                label = data.label,
+                            },
+                        },
+                        distance = 5.0
+                    })
+                end
 			end
 			
 			if dist >= data["SpawnRange"] and v["IsRendered"] then
@@ -210,3 +235,48 @@ AddEventHandler('onResourceStop', function(resourceName)
         end
     end
 end)
+
+function ButtonMessage(text)
+    BeginTextCommandScaleformString("STRING")
+    AddTextComponentScaleform(text)
+    EndTextCommandScaleformString()
+end
+
+function Button(ControlButton)
+    N_0xe83a3e3557a56640(ControlButton)
+end
+
+function setupScaleform(scaleform)
+    local scaleform = RequestScaleformMovie(scaleform)
+    while not HasScaleformMovieLoaded(scaleform) do
+        Citizen.Wait(0)
+    end
+
+    -- draw it once to set up layout
+    DrawScaleformMovieFullscreen(scaleform, 255, 255, 255, 0, 0)
+
+    PushScaleformMovieFunction(scaleform, "CLEAR_ALL")
+    PopScaleformMovieFunctionVoid()
+    
+    PushScaleformMovieFunction(scaleform, "SET_CLEAR_SPACE")
+    PushScaleformMovieFunctionParameterInt(200)
+    PopScaleformMovieFunctionVoid()
+
+    PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT")
+    PushScaleformMovieFunctionParameterInt(0)
+    Button(GetControlInstructionalButton(2, 153, true))
+    ButtonMessage("Place object")
+    PopScaleformMovieFunctionVoid()
+
+    PushScaleformMovieFunction(scaleform, "DRAW_INSTRUCTIONAL_BUTTONS")
+    PopScaleformMovieFunctionVoid()
+
+    PushScaleformMovieFunction(scaleform, "SET_BACKGROUND_COLOUR")
+    PushScaleformMovieFunctionParameterInt(0)
+    PushScaleformMovieFunctionParameterInt(0)
+    PushScaleformMovieFunctionParameterInt(0)
+    PushScaleformMovieFunctionParameterInt(80)
+    PopScaleformMovieFunctionVoid()
+
+    return scaleform
+end

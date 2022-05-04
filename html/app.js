@@ -33,6 +33,7 @@ const menu = {
         },
         SpawnObject: function() {
             $.post(`https://${GetParentResourceName()}/spawn`, JSON.stringify({object: this.CurrentObject }));
+            closeMenu()
         },
         UpdateObjectList: function(ObjectList) {
             ObjectList = ObjectList
