@@ -55,7 +55,7 @@ end)
 RegisterNUICallback('spawn', function(data)
     SetNuiFocus(false, false)
     PlacingObject = true
-    CreateSpawnedObject(data.object)
+    CreateSpawnedObject(data)
 end)
 
 function RequestSpawnObject(object)
@@ -96,7 +96,12 @@ function RayCastGamePlayCamera(distance)
 	return b, c, e
 end
 
-function CreateSpawnedObject(object)
+function CreateSpawnedObject(data)
+    if data.object == nil then return print("Invalid Object") end
+    local object = data.object
+    local type = data.type or "none"
+    local renderDistance = data.distance or 15
+    
     RequestSpawnObject(object)
 
     CurrentModel = object

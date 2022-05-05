@@ -41,6 +41,40 @@
             </q-item>
             <q-item>
                 <q-item-section>
+                    <q-input
+                        type="number"
+                        filled
+                        style="max-width: 200px"
+                        hint="Render Distance"
+                        @update:model-value="SetRenderDistance($event)"
+                    />
+                </q-item-section>
+            </q-item>
+            <q-item>
+                <q-item-section>
+                    <q-select 
+                        outlined 
+                        dense 
+                        use-input 
+                        input-debounce="0" 
+                        label="Type" 
+                        label-color="white"
+                        color="info"
+                        @update:model-value="ObjectType($event)"
+                        v-model="types" 
+                        :options="typeOptions" 
+                        @filter="typeFilter"
+                    >
+                        <template v-slot:no-option>
+                            <q-item>
+                                <q-item-section class="text-white">No results</q-item-section>
+                            </q-item>
+                        </template>
+                    </q-select>
+                </q-item-section>
+            </q-item>
+            <q-item>
+                <q-item-section>
                     <q-btn color="info" text-color="white" label="Spawn Object" v-on:click="SpawnObject()" />
                 </q-item-section>
             </q-item>
