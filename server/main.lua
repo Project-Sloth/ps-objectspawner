@@ -2,11 +2,15 @@ local QBCore = exports["qb-core"]:GetCoreObject()
 local ServerObjects = {}
 
 RegisterNetEvent("objects:CreateNewObject", function(model, coords, objecttype, options)
+    print(objecttype)
     local src = source
-    if model and coords and objecttype then
-        MySQL.query.await("INSERT INTO objects (model, coords, type, options) VALUES (?, ?, ?, ?)", { model, json.encode(coords), objecttype, json.encode(options) })
-        ServerObjects[#ServerObjects+1] = {model = model, coords = json.encode(coords), type = objecttype, options = json.encode(options) }
-        TriggerClientEvent("objects:UpdateObjectList", -1, ServerObjects)
+    print(model)
+    print(coords)
+    print(objecttype)
+    if model and coords then
+        local data = MySQL.query.await("INSERT INTO objects (model, coords, type, options) VALUES (?, ?, ?, ?)", { model, json.encode(coords), objecttype, json.encode(options) })
+        ServerObjects[#ServerObjects+1] = {id = data.insertId, model = model, coords = json.encode(coords), type = objecttype, options = json.encode(options)}
+        TriggerClientEvent("objects:AddObject", -1, {id = data.insertId, model = model, coords = json.encode(coords), type = objecttype, options = json.encode(options)})
     else 
         print("[P-OBJECTS]: Object or coords was invalid")
     end

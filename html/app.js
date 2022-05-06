@@ -71,13 +71,20 @@ const menu = {
             if (event.data.action === "open") {
                 $(".container").fadeIn(150);
             } else if (event.data.action === "load") {
-                let temp = []
+                let objects = []
+                let objectTypes = []
                 $.each(event.data.objects, function(i, v) {
                     if (v == true ) {
-                        temp.push(i)
+                        objects.push(i)
                     }
                 });
-                ObjectList = temp
+
+                $.each(event.data.objectTypes, function(i, v) {
+                    objectTypes.push(v)
+                });
+
+                ObjectList = objects
+                ObjectTypes = objectTypes
                 $(".container").fadeIn(150);
             }
         });
