@@ -117,17 +117,19 @@ local function RayCastGamePlayCamera(distance)
 		y = cameraCoord.y + direction.y * distance,
 		z = cameraCoord.z + direction.z * distance
 	}
-	local a, b, c, d, e = GetShapeTestResult(StartShapeTestRay(cameraCoord.x, cameraCoord.y, cameraCoord.z, destination.x, destination.y, destination.z, -1, PlayerPedId(), 0))
+	local a, b, c, d, e = GetShapeTestResult(StartShapeTestSweptSphere(cameraCoord.x, cameraCoord.y, cameraCoord.z, destination.x, destination.y, destination.z, 0.2, 339, PlayerPedId(), 4))
 	return b, c, e
 end
 
-local function PlaceSpawnedObject()
+local function PlaceSpawnedObject(heading)
+    print(heading)
     local ObjectType = 'prop' --will be replaced with inputted prop type later, which will determine options/events
     local Options = { SpawnRange = tonumber(CurrentSpawnRange) }
     if ObjectParams[CurrentObjectType] ~= nil then
         Options = { event = ObjectParams[CurrentObjectType].event, icon = ObjectParams[CurrentObjectType].icon, label = ObjectParams[CurrentObjectType].label, SpawnRange = ObjectParams[CurrentObjectType].SpawnRange} --will be replaced with config of options later
     end
-    TriggerServerEvent("objects:CreateNewObject", CurrentModel, CurrentCoords, CurrentObjectType, Options)
+    local finalCoords = vector4(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, heading)
+    TriggerServerEvent("objects:CreateNewObject", CurrentModel, finalCoords, CurrentObjectType, Options)
     DeleteObject(CurrentObject)
     PlacingObject = false
     CurrentObject = nil
@@ -146,27 +148,39 @@ local function CreateSpawnedObject(data)
     RequestSpawnObject(object)
     CurrentModel = object
     CurrentObject = CreateObject(object, 1.0, 1.0, 1.0, true, true, false)
-    SetEntityHeading(CurrentObject, GetEntityHeading(PlayerPedId()))
+    local heading = 0.0
+    SetEntityHeading(CurrentObject, 0)
+    
     SetEntityAlpha(CurrentObject, 150)
     SetEntityCollision(CurrentObject, false, false)
-    SetEntityInvincible(CurrentObject, true)
+    -- SetEntityInvincible(CurrentObject, true)
     FreezeEntityPosition(CurrentObject, true)
 
     CreateThread(function()
         form = setupScaleform("instructional_buttons")
         while PlacingObject do
-            local hit, coords, entity = RayCastGamePlayCamera(1000.0)
+            local hit, coords, entity = RayCastGamePlayCamera(20.0)
             CurrentCoords = coords
 
             DrawScaleformMovieFullscreen(form, 255, 255, 255, 255, 0)
 
             if hit then
                 SetEntityCoords(CurrentObject, coords.x, coords.y, coords.z)
-                PlaceObjectOnGroundProperly(CurrentObject)
             end
             
+            if IsControlJustPressed(0, 174) then
+                heading = heading + 5
+                if heading > 360 then heading = 0.0 end
+            end
+    
+            if IsControlJustPressed(0, 175) then
+                heading = heading - 5
+                if heading < 0 then heading = 360.0 end
+            end 
+
+            SetEntityHeading(CurrentObject, heading)
             if IsControlJustPressed(0, 38) then
-                PlaceSpawnedObject()
+                PlaceSpawnedObject(heading)
             end
             
             Wait(1)
@@ -184,25 +198,6 @@ local function CancelPlacement()
     CurrentObjectType = nil
     CurrentSpawnRange = nil
     CurrentCoords = nil
-end
-
-local function RotateObject(direction)
-    if CurrentObject ~= nil then 
-
-        local yaw = GetEntityRotation(CurrentObject, 1, false)
-        local roll = GetEntityRoll(CurrentObject)
-        local pitch = GetEntityPitch(CurrentObject)
-
-        if direction == "x" then
-            SetEntityRotation(CurrentObject, pitch + 1.0, roll, yaw.z, 1, false)
-        elseif direction == "y" then
-            SetEntityRotation(CurrentObject, pitch, roll + 1.0, yaw.z, 1, false)
-        elseif direction == "z" then 
-            SetEntityRotation(CurrentObject, pitch, roll, yaw.z + 1.0, 1, false)
-        end
-    else
-        print("No Object to rotate!")
-    end
 end
 
 RegisterNUICallback('close', function()
@@ -224,33 +219,10 @@ RegisterCommand('object', function()
     openMenu()
 end)
 
-RegisterCommand('+PlaceObject', function()
-    PlaceSpawnedObject()
-end)
-RegisterKeyMapping("+PlaceObject", "Place Object", "keyboard", "")
-
 RegisterCommand('+CancelObject', function()
     CancelPlacement()
 end)
 RegisterKeyMapping("+CancelObject", "Cancel Placing Object", "keyboard", "")
-
-RegisterCommand('+RotateObject', function()
-    RotateObject(CurrentDirection)
-end)
-RegisterKeyMapping("+RotateObject", "Rotate Object", "keyboard", "")
-
-RegisterCommand('+ToggleRotationMode', function()
-    if CurrentDirection == "x" then 
-        CurrentDirection = "y"
-    elseif CurrentDirection == "y" then 
-        CurrentDirection = "z"
-    elseif CurrentDirection == "z" then 
-        CurrentDirection = "x"
-    end
-    --print(CurrentDirection)
-end)
-RegisterKeyMapping("+ToggleRotationMode", "Toggle Rotation Mode", "keyboard", "")
-
 
 CreateThread(function()
 	while true do
@@ -277,19 +249,19 @@ CreateThread(function()
                 print(v.type, v.type)
                 if ObjectParams[v.type] ~= nil and ObjectParams[v.type].event ~= nil then
                     print("HELLO?")
-                    exports.qtarget:AddTargetEntity(object, {
-                        --debugPoly=true,
-                        options = {
-                            {
-                                name = "object_spawner_"..object, 
-                                event = ObjectParams[v.type].event,
-                                icon = ObjectParams[v.type].icon,
-                                label = ObjectParams[v.type].label,
-                                id = v.id
-                            },
-                        },
-                        distance = ObjectParams[data.SpawnRange]
-                    })
+                    -- exports.qtarget:AddTargetEntity(object, {
+                    --     --debugPoly=true,
+                    --     options = {
+                    --         {
+                    --             name = "object_spawner_"..object, 
+                    --             event = ObjectParams[v.type].event,
+                    --             icon = ObjectParams[v.type].icon,
+                    --             label = ObjectParams[v.type].label,
+                    --             id = v.id
+                    --         },
+                    --     },
+                    --     distance = ObjectParams[data.SpawnRange]
+                    -- })
                 end
 			end
 			

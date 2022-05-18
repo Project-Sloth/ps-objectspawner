@@ -22,6 +22,7 @@ end
 exports("CreateDataObject", CreateDataObject)
 
 CreateThread(function()
+    -- MySQL.Async.execute('DELETE FROM objects')
     ServerObjects = MySQL.query.await('SELECT * FROM objects', {})
     Wait(5000)
     TriggerClientEvent("objects:UpdateObjectList", -1, ServerObjects)
