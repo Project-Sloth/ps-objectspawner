@@ -45,7 +45,6 @@ const store = () => {
     receiveLoadMessage(data) {
       let objects: Array<{ value: string }> = [];
       let objectTypes: Array<{ value: string }> = [];
-      console.log("Data received:", data);
 
       for (const [key, value] of Object.entries(data.objects)) {
         if (value) {
@@ -53,13 +52,9 @@ const store = () => {
         }
       }
 
-      console.log("Past here");
-
       for (const name of data.objectTypes) {
         objectTypes.push({ value: name as string });
       }
-
-      console.log("Past here 2");
       
       update(state => {
         state.objectList = objects;

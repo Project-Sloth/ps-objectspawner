@@ -28,7 +28,7 @@
           <p>Select Object Type</p>
           <Select valuesArray={$ObjectStore.objectTypes} handleSelectFunction={(val) => ObjectStore.setObjectType(val)}/>
         </div>
-        <Button name={"Spawn Object"} buttonClass="w-50 mx-auto" on:click={ObjectStore.spawnObject}/>
+        <Button name={"Spawn Object"} buttonClass="mx-auto" on:click={ObjectStore.spawnObject}/>
       </div>
     </div>
   </main>
