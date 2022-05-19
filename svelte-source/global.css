@@ -1,0 +1,16 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* --ps-hud-primary: #2bbca6; */
+  --ps-primary: #00ffbf;
+  --ps-primary-hover: #13554b;
+  --ps-secondary: #444444;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+}

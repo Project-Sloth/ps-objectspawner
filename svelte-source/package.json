@@ -1,0 +1,28 @@
+{
+  "name": "svelte-source",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.44",
+    "@tsconfig/svelte": "^2.0.1",
+    "html-minifier": "^4.0.0",
+    "svelte": "^3.48.0",
+    "svelte-check": "^2.7.1",
+    "svelte-preprocess": "^4.10.6",
+    "tslib": "^2.4.0",
+    "typescript": "^4.6.4",
+    "vite": "^2.9.9",
+    "vite-plugin-windicss": "^1.8.4",
+    "windicss": "^3.5.4"
+  },
+  "dependencies": {
+    "svelte-select": "^4.4.7"
+  }
+}
