@@ -19,44 +19,61 @@
             <q-item>
                 <q-item-section>
                     <q-select 
+                        dark
                         outlined 
-                        dense 
+                        dense
                         use-input 
-                        input-debounce="0" 
-                        label="Objects" 
+                        input-debounce="0"
+                        label="Objects"
                         label-color="white" 
-                        color="info"
+                        color="white"
                         @update:model-value="UpdateObject($event)"
                         v-model="model" 
                         :options="objectOptions" 
                         @filter="filterFn"
+
                     >
                         <template v-slot:no-option>
                             <q-item>
                                 <q-item-section class="text-white">No results</q-item-section>
                             </q-item>
                         </template>
+                        <template v-slot:selected>
+                            <q-item>
+                                <q-item-section class="text-white">{{ CurrentObject }}</q-item-section>
+                            </q-item>
+                          </template>
                     </q-select>
                 </q-item-section>
             </q-item>
             <q-item>
                 <q-item-section>
                     <q-input
+                        dark
                         type="number"
                         filled
                         style="max-width: 200px"
                         hint="Render Distance"
                         @update:model-value="SetRenderDistance($event)"
+                        color="white"
+                        label-color="white"
+                        input-style="color: white"
                     />
+                    <template v-slot:hint>
+                        <q-item>
+                            <q-item-section class="text-white">Render Distance</q-item-section>
+                        </q-item>
+                      </template>
                 </q-item-section>
             </q-item>
             <q-item>
                 <q-item-section>
-                    <q-select 
+                    <q-select
+                        dark
                         outlined 
                         dense 
                         use-input 
-                        input-debounce="0" 
+                        input-debounce="0"
                         label="Type" 
                         label-color="white"
                         color="info"
@@ -64,12 +81,18 @@
                         v-model="types" 
                         :options="typeOptions" 
                         @filter="typeFilter"
+                        input-style="color: white"
                     >
                         <template v-slot:no-option>
                             <q-item>
                                 <q-item-section class="text-white">No results</q-item-section>
                             </q-item>
                         </template>
+                        <template v-slot:selected>
+                            <q-item>
+                                <q-item-section class="text-white">{{ CurrentType }}</q-item-section>
+                            </q-item>
+                          </template>
                     </q-select>
                 </q-item-section>
             </q-item>
