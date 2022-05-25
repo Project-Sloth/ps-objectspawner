@@ -18,7 +18,7 @@
       <div class="flex flex-col gap-5 text-center">
         <div class="flex flex-col gap-1">
           <p>Select Object</p>
-          <Select valuesArray={$ObjectStore.objectList} handleSelectFunction={(val) => ObjectStore.setObject(val)}/>
+          <Select valuesArray={$ObjectStore.objectList} handleSelectFunction={(val) => ObjectStore.setObject(val)} virtualList/>
         </div>
         <div class="flex flex-col gap-1">
           <p>Render Distance</p>

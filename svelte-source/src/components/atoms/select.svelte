@@ -5,6 +5,7 @@
   export let handleSelectFunction: (val) => void = (val) => null;
   export let value: any = null;
   export let placeHolder: string = "Search...";
+  export let virtualList: boolean = false;
 
   function handleSelect(event) {
     handleSelectFunction(event.detail.value);
@@ -13,7 +14,7 @@
 </script>
 
 <div class="themed text-white text-base">
-  <Select items={valuesArray} labelIdentifier={"value"} {value} on:select={handleSelect} placeholder={placeHolder}/>
+  <Select items={valuesArray} labelIdentifier={"value"} {value} on:select={handleSelect} placeholder={placeHolder} isVirtualList={virtualList}/>
 </div>
 
 <style>
