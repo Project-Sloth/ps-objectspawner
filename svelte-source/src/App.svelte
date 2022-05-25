@@ -5,7 +5,6 @@
   import NumberInput from './components/atoms/number-input.svelte';
   import Select from './components/atoms/select.svelte';
   import Button from './components/atoms/button.svelte';
-  
 
   EventHandler();
   document.onkeyup = ObjectStore.handleKeyUp;
