@@ -5,11 +5,19 @@
 
 :root {
   --ps-primary: #00ffbf;
-  --ps-primary-hover: #13554b;
+  --ps-primary-hover: #1b7c6d;
   --ps-secondary: #444444;
 }
 
 html, body {
   height: 100%;
   width: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  background-color: rgba(60, 60, 60, 1);
 }
