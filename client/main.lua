@@ -1,13 +1,8 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local ObjectList = {} -- Object, Model, Coords, IsRendered, SpawnRange
 
-local PlacingObject = false
-local LoadedObjects = false
-local CurrentModel = nil
-local CurrentObject = nil
-local CurrentObjectType = nil
-local CurrentSpawnRange = nil
-local CurrentCoords = nil
+local PlacingObject, LoadedObjects = false, false
+local CurrentModel, CurrentObject, CurrentObjectType, CurrentObjectName, CurrentSpawnRange, CurrentCoords = nil, nil, nil, nil, nil, nil
 
 local group = 'user'
 
@@ -24,7 +19,10 @@ local ObjectParams = {
 local function openMenu()
     SetNuiFocus(true, true)
     if LoadedObjects then
-        SendNUIMessage({ action = "open"})
+        SendNUIMessage({ 
+            action = "open",
+            objects = ObjectList,
+        })
     else
         LoadedObjects = true
         SendNUIMessage({ action = "load", objects = Objects, objectTypes = ObjectTypes })
@@ -183,11 +181,12 @@ local function PlaceSpawnedObject(heading)
         Options = { event = ObjectParams[CurrentObjectType].event, icon = ObjectParams[CurrentObjectType].icon, label = ObjectParams[CurrentObjectType].label, SpawnRange = ObjectParams[CurrentObjectType].SpawnRange} --will be replaced with config of options later
     end
     local finalCoords = vector4(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, heading)
-    TriggerServerEvent("ps-objectspawner:server:CreateNewObject", CurrentModel, finalCoords, CurrentObjectType, Options)
+    TriggerServerEvent("ps-objectspawner:server:CreateNewObject", CurrentModel, finalCoords, CurrentObjectType, Options, CurrentObjectName)
     DeleteObject(CurrentObject)
     PlacingObject = false
     CurrentObject = nil
     CurrentObjectType = nil
+    CurrentObjectName = nil
     CurrentSpawnRange = nil
     CurrentCoords = nil
     CurrentModel = nil
@@ -197,6 +196,7 @@ local function CreateSpawnedObject(data)
     if data.object == nil then return print("Invalid Object") end
     local object = data.object
     CurrentObjectType = data.type
+    CurrentObjectName = data.name and data.name ~= nil or "Random Object"
     CurrentSpawnRange = ObjectParams[objectType] and ObjectParams[objectType] ~= nil or data.distance or 15
     
     RequestSpawnObject(object)
@@ -248,18 +248,21 @@ local function CancelPlacement()
     PlacingObject = false
     CurrentObject = nil
     CurrentObjectType = nil
+    CurrentObjectName = nil
     CurrentSpawnRange = nil
     CurrentCoords = nil
 end
 
-RegisterNUICallback('close', function()
+RegisterNUICallback('close', function(data, cb)
     SetNuiFocus(false, false)
+    cb('ok')
 end)
 
-RegisterNUICallback('spawn', function(data)
+RegisterNUICallback('spawn', function(data, cb)
     SetNuiFocus(false, false)
     PlacingObject = true
     CreateSpawnedObject(data)
+    cb('ok')
 end)
 
 RegisterNetEvent("ps-objectspawner:client:UpdateObjectList", function(NewObjectList)
@@ -268,7 +271,7 @@ end)
 
 CreateThread(function()
 	while true do
-		for _, v in pairs(ObjectList) do
+		for k, v in pairs(ObjectList) do
             local data = json.decode(v["options"])
             local objectCoords = json.decode(v["coords"])
 			local playerCoords = GetEntityCoords(PlayerPedId())
@@ -328,5 +331,36 @@ CreateThread(function()
 end)
 
 RegisterNetEvent("ps-objectspawner:client:AddObject", function(object)
-    ObjectList[#ObjectList+1] = object
+    ObjectList[object.id] = object
+end)
+
+RegisterNUICallback('tpTo', function(data, cb)
+    if group == 'god' then
+        SetEntityCoords(PlayerPedId(), data.coords.x, data.coords.y, data.coords.z)
+    end
+    cb('ok')
+end)
+
+RegisterNUICallback('delete', function(data, cb)
+    if group == 'god' then
+        QBCore.Functions.TriggerCallback('ps-objectspawner:server:RequestObjects', function(incObjectList)
+            ObjectList = incObjectList
+        end, data.id)
+    end
+    cb('ok')
+end)
+
+RegisterNetEvent('ps-objectspawner:client:receiveObjectDelete', function(id)
+    if ObjectList[id]["IsRendered"] then
+        if DoesEntityExist(ObjectList[id]["object"]) then 
+            for i = 255, 0, -51 do
+                Wait(50)
+                SetEntityAlpha(ObjectList[id]["object"], i, false)
+            end
+            DeleteObject(ObjectList[id]["object"])
+
+            RemoveRoadNodeSpeedZone(ObjectList[id]["speedzone"])
+            ObjectList[id] = nil
+        end
+    end
 end)
