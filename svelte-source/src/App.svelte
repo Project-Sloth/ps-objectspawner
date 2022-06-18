@@ -2,32 +2,46 @@
   import { fade } from 'svelte/transition';
   import { EventHandler } from './utils/eventHandler';
   import ObjectStore from './stores/objectStore';
-  import NumberInput from './components/atoms/number-input.svelte';
-  import Select from './components/atoms/select.svelte';
-  import Button from './components/atoms/button.svelte';
+  import debug from './stores/debugStore';
+  import Tab from './components/atoms/tab.svelte';
+  import CreatePanel from './components/panels/create.svelte';
+  import ManagePanel from './components/panels/manage.svelte';
 
   EventHandler();
   document.onkeyup = ObjectStore.handleKeyUp;
 
+  interface tabType {
+    name: string
+    content: any
+  }
+
+  let { isOpen } = ObjectStore;
+
+  let tabArray: Array<tabType> = [
+    { name: "Create", content: CreatePanel },
+    { name: "Manage", content: ManagePanel },
+  ];
+  let activeTab: tabType = tabArray[0];
+
+  function handleClick(index: number) {
+    activeTab = tabArray[index];
+  }
 </script>
 
-{#if $ObjectStore.isOpen}
-  <main class="min-h-screen flex justify-center items-center" transition:fade="{{duration: 200}}">
-    <div class="bg-dark-100 text-white w-[300px] p-5 text-lg rounded-lg shadow-xl my-auto font-semibold">
-      <div class="flex flex-col gap-5 text-center">
-        <div class="flex flex-col gap-1">
-          <p>Select Object</p>
-          <Select valuesArray={$ObjectStore.objectList} handleSelectFunction={(val) => ObjectStore.setObject(val)} virtualList/>
-        </div>
-        <div class="flex flex-col gap-1">
-          <p>Render Distance</p>
-          <NumberInput min={0} max={100} value={$ObjectStore.renderDistance} handleUpdateFunction={(val) => ObjectStore.setRenderDisable(val)}/>
-        </div>
-        <div class="flex flex-col gap-1">
-          <p>Select Object Type</p>
-          <Select valuesArray={$ObjectStore.objectTypes} handleSelectFunction={(val) => ObjectStore.setObjectType(val)}/>
-        </div>
-        <Button name={"Spawn Object"} buttonClass="mx-auto" on:click={ObjectStore.spawnObject}/>
+{#if $isOpen || debug}
+  <main class="min-h-screen flex justify-center items-center {debug ? "bg-dark-300":""}" transition:fade="{{duration: 200}}">
+    <div class="bg-dark-100 text-white w-[820px] h-[550px] p-5 text-lg rounded-lg shadow-xl my-auto font-semibold select-none">
+      <div class="flex flex-row gap-2 mb-5">
+        {#each tabArray as tab, i}
+          <Tab name={tab.name} on:click={() => handleClick(i)} active={tab.name == activeTab.name}/>
+        {/each}
+      </div>
+      <div class="flex flex-col">
+        {#each tabArray as tab}
+          {#if activeTab.name == tab.name }
+            <svelte:component this={tab.content}/>
+          {/if}
+        {/each}
       </div>
     </div>
   </main>

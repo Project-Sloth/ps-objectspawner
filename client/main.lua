@@ -1,13 +1,10 @@
+local QBCore = exports['qb-core']:GetCoreObject()
 local ObjectList = {} -- Object, Model, Coords, IsRendered, SpawnRange
 
-local PlacingObject = false
-local LoadedObjects = false
-local CurrentModel = nil
-local CurrentObject = nil
-local CurrentObjectType = nil
-local CurrentSpawnRange = nil
-local CurrentCoords = nil
-local CurrentDirection = "x"
+local PlacingObject, LoadedObjects = false, false
+local CurrentModel, CurrentObject, CurrentObjectType, CurrentObjectName, CurrentSpawnRange, CurrentCoords = nil, nil, nil, nil, nil, nil
+
+local group = {user = true}
 
 local ObjectTypes = {
     "none",
@@ -18,25 +15,84 @@ local ObjectParams = {
     ["container"] = {event = "ps-objectspawner:client:containers", icon = "fas fa-question", label = "Container", SpawnRange = 200},
 }
 
+--Functions
+local function openMenu()
+    SetNuiFocus(true, true)
+    if LoadedObjects then
+        SendNUIMessage({ 
+            action = "open",
+        })
+    else
+        LoadedObjects = true
+        local tempList = {}
+        -- In js, objects cant have number keys so we need to change them to strings to be treated as object
+        -- If we dont do this it will be sent as an array which is bad because it fills in missing array indexes
+        --   from 0 to min(table ids)
+        for k, v in pairs(ObjectList) do
+            tempList[""..k] = v
+        end
+        SendNUIMessage({
+            action = "load",
+            objects = Objects, 
+            objectTypes = ObjectTypes, 
+            spawnedObjects = tempList,
+        })
+    end
+end
+
+AddEventHandler('onResourceStart', function(resourceName)
+    if GetCurrentResourceName() == resourceName then
+        QBCore.Functions.TriggerCallback('qb-afkkick:server:GetPermissions', function(UserGroup)
+            group = UserGroup
+            if group and group['god'] or group == 'god' then
+                RegisterCommand('object', function()
+                    openMenu()
+                end)
+        
+                RegisterCommand('+CancelObject', function()
+                    CancelPlacement()
+                end)
+        
+                RegisterKeyMapping("+CancelObject", "Cancel Placing Object", "keyboard", "")
+            end
+        end)
+        QBCore.Functions.TriggerCallback('ps-objectspawner:server:RequestObjects', function(incObjectList)
+            ObjectList = incObjectList
+        end)
+    end
+end)
+
 AddEventHandler('onResourceStop', function(resourceName)
     if GetCurrentResourceName() == resourceName then
         for k, v in pairs(ObjectList) do
             if v["IsRendered"] then
+                RemoveRoadNodeSpeedZone(v["speedzone"])
                 DeleteObject(v["object"])
             end
         end
     end
 end)
 
-local function openMenu()
-    SetNuiFocus(true, true)
-    if LoadedObjects then
-        SendNUIMessage({ action = "open"})
-    else
-        LoadedObjects = true
-        SendNUIMessage({ action = "load", objects = Objects, objectTypes = ObjectTypes })
-    end
-end
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
+    QBCore.Functions.TriggerCallback('ps-objectspawner:server:RequestObjects', function(incObjectList)
+        ObjectList = incObjectList
+    end)
+
+    QBCore.Functions.TriggerCallback('qb-afkkick:server:GetPermissions', function(UserGroup)
+        group = UserGroup
+        if group and group['god'] or group == 'god' then
+            RegisterCommand('object', function()
+                openMenu()
+            end)
+    
+            RegisterCommand('+CancelObject', function()
+                CancelPlacement()
+            end)
+    
+            RegisterKeyMapping("+CancelObject", "Cancel Placing Object", "keyboard", "")
+        end
+    end)
+end)
 
 local function ButtonMessage(text)
     BeginTextCommandScaleformString("STRING")
@@ -68,6 +124,13 @@ local function setupScaleform(scaleform)
     PushScaleformMovieFunctionParameterInt(0)
     Button(GetControlInstructionalButton(2, 153, true))
     ButtonMessage("Place object")
+    PopScaleformMovieFunctionVoid()
+
+    PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT")
+    PushScaleformMovieFunctionParameterInt(1)
+    Button(GetControlInstructionalButton(2, 190, true))
+    Button(GetControlInstructionalButton(2, 189, true))
+    ButtonMessage("Rotate object")
     PopScaleformMovieFunctionVoid()
 
     PushScaleformMovieFunction(scaleform, "DRAW_INSTRUCTIONAL_BUTTONS")
@@ -122,18 +185,18 @@ local function RayCastGamePlayCamera(distance)
 end
 
 local function PlaceSpawnedObject(heading)
-    print(heading)
     local ObjectType = 'prop' --will be replaced with inputted prop type later, which will determine options/events
     local Options = { SpawnRange = tonumber(CurrentSpawnRange) }
     if ObjectParams[CurrentObjectType] ~= nil then
         Options = { event = ObjectParams[CurrentObjectType].event, icon = ObjectParams[CurrentObjectType].icon, label = ObjectParams[CurrentObjectType].label, SpawnRange = ObjectParams[CurrentObjectType].SpawnRange} --will be replaced with config of options later
     end
     local finalCoords = vector4(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, heading)
-    TriggerServerEvent("objects:CreateNewObject", CurrentModel, finalCoords, CurrentObjectType, Options)
+    TriggerServerEvent("ps-objectspawner:server:CreateNewObject", CurrentModel, finalCoords, CurrentObjectType, Options, CurrentObjectName)
     DeleteObject(CurrentObject)
     PlacingObject = false
     CurrentObject = nil
     CurrentObjectType = nil
+    CurrentObjectName = nil
     CurrentSpawnRange = nil
     CurrentCoords = nil
     CurrentModel = nil
@@ -143,6 +206,7 @@ local function CreateSpawnedObject(data)
     if data.object == nil then return print("Invalid Object") end
     local object = data.object
     CurrentObjectType = data.type
+    CurrentObjectName = data.name or "Random Object"
     CurrentSpawnRange = ObjectParams[objectType] and ObjectParams[objectType] ~= nil or data.distance or 15
     
     RequestSpawnObject(object)
@@ -188,47 +252,38 @@ local function CreateSpawnedObject(data)
     end)
 end
 
-
-
 local function CancelPlacement()
     DeleteObject(CurrentObject)
     SetNuiFocus(true, true)
     PlacingObject = false
     CurrentObject = nil
     CurrentObjectType = nil
+    CurrentObjectName = nil
     CurrentSpawnRange = nil
     CurrentCoords = nil
 end
 
-RegisterNUICallback('close', function()
+RegisterNUICallback('close', function(data, cb)
     SetNuiFocus(false, false)
+    cb('ok')
 end)
 
-RegisterNUICallback('spawn', function(data)
+RegisterNUICallback('spawn', function(data, cb)
     SetNuiFocus(false, false)
     PlacingObject = true
     CreateSpawnedObject(data)
+    cb('ok')
 end)
 
-RegisterNetEvent("objects:UpdateObjectList", function(NewObjectList)
+RegisterNetEvent("ps-objectspawner:client:UpdateObjectList", function(NewObjectList)
     ObjectList = NewObjectList
-    print("Object List Updated")
 end)
-
-RegisterCommand('object', function()
-    openMenu()
-end)
-
-RegisterCommand('+CancelObject', function()
-    CancelPlacement()
-end)
-RegisterKeyMapping("+CancelObject", "Cancel Placing Object", "keyboard", "")
 
 CreateThread(function()
 	while true do
-		for _, v in pairs(ObjectList) do
-            local data = json.decode(v["options"])
-            local objectCoords = json.decode(v["coords"])
+		for k, v in pairs(ObjectList) do
+            local data = v["options"]
+            local objectCoords = v["coords"]
 			local playerCoords = GetEntityCoords(PlayerPedId())
 			local dist = #(playerCoords - vector3(objectCoords["x"], objectCoords["y"], objectCoords["z"]))
 
@@ -241,27 +296,29 @@ CreateThread(function()
 				v["IsRendered"] = true
                 v["object"] = object
 
+                --local model = GetEntityModel(object)
+                --local min, max = GetModelDimensions(model) --TODO: get max model dimensions to generate the SpeedZone radius
+                v["speedzone"] = AddRoadNodeSpeedZone(objectCoords["x"], objectCoords["y"], objectCoords["z"], 10.0, 0, false)
+
                 for i = 0, 255, 51 do
                     Wait(50)
                     SetEntityAlpha(v["object"], i, false)
                 end
 
-                print(v.type, v.type)
                 if ObjectParams[v.type] ~= nil and ObjectParams[v.type].event ~= nil then
-                    print("HELLO?")
-                    -- exports.qtarget:AddTargetEntity(object, {
-                    --     --debugPoly=true,
-                    --     options = {
-                    --         {
-                    --             name = "object_spawner_"..object, 
-                    --             event = ObjectParams[v.type].event,
-                    --             icon = ObjectParams[v.type].icon,
-                    --             label = ObjectParams[v.type].label,
-                    --             id = v.id
-                    --         },
-                    --     },
-                    --     distance = ObjectParams[data.SpawnRange]
-                    -- })
+                    exports.qtarget:AddTargetEntity(object, {
+                        --debugPoly=true,
+                        options = {
+                            {
+                                name = "object_spawner_"..object, 
+                                event = ObjectParams[v.type].event,
+                                icon = ObjectParams[v.type].icon,
+                                label = ObjectParams[v.type].label,
+                                id = v.id
+                            },
+                        },
+                        distance = ObjectParams[data.SpawnRange]
+                    })
                 end
 			end
 			
@@ -272,6 +329,8 @@ CreateThread(function()
                         SetEntityAlpha(v["object"], i, false)
                     end
                     DeleteObject(v["object"])
+
+                    RemoveRoadNodeSpeedZone(v["speedzone"])
                     v["object"] = nil
                     v["IsRendered"] = nil
                 end
@@ -281,6 +340,47 @@ CreateThread(function()
 	end
 end)
 
-RegisterNetEvent("objects:AddObject", function(object)
-    ObjectList[#ObjectList+1] = object
+RegisterNetEvent("ps-objectspawner:client:AddObject", function(object)
+    ObjectList[object.id] = object
+    if group and group['god'] or group == 'god' then
+        SendNUIMessage({ 
+            action = "created",
+            newSpawnedObject = object,
+        })
+    end
+end)
+
+RegisterNUICallback('tpTo', function(data, cb)
+    if group and group['god'] or group == 'god' then
+        SetEntityCoords(PlayerPedId(), data.coords.x+1, data.coords.y+1, data.coords.z)
+    end
+    cb('ok')
+end)
+
+RegisterNUICallback('delete', function(data, cb)
+    if group and group['god'] or group == 'god' then
+        TriggerServerEvent("ps-objectspawner:server:DeleteObject", data.id)
+    end
+    cb('ok')
+end)
+
+RegisterNetEvent('ps-objectspawner:client:receiveObjectDelete', function(id)
+    if group and group['god'] or group == 'god' then
+        if ObjectList[id]["IsRendered"] then
+            if DoesEntityExist(ObjectList[id]["object"]) then 
+                for i = 255, 0, -51 do
+                    Wait(50)
+                    SetEntityAlpha(ObjectList[id]["object"], i, false)
+                end
+                DeleteObject(ObjectList[id]["object"])
+
+                RemoveRoadNodeSpeedZone(ObjectList[id]["speedzone"])
+            end
+        end
+        ObjectList[id] = nil
+        SendNUIMessage({ 
+            action = "delete",
+            id = id,
+        })
+    end
 end)

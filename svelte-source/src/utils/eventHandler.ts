@@ -1,5 +1,6 @@
 import { onMount, onDestroy } from "svelte";
 import ObjectStore from '../stores/objectStore';
+import type { createdMessageData, deleteMessageData, loadMessageData } from '../types/types';
 
 interface nuiMessage {
   data: {
@@ -11,11 +12,18 @@ interface nuiMessage {
 export function EventHandler() {
   function handleEvents(event: nuiMessage) {
     switch (event.data.action) {
+      case "created":
+        ObjectStore.receiveCreatedMessage(event.data as createdMessageData);
+        break;
+      case "delete":
+        ObjectStore.receiveDeleteMessage(event.data as deleteMessageData);
+        break;
       case "open":
         ObjectStore.receiveOpenMessage();
         break;
       case "load":
-        ObjectStore.receiveLoadMessage(event.data);
+        ObjectStore.receiveLoadMessage(event.data as loadMessageData);
+        break;
     }
   }
 

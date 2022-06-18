@@ -1,34 +1,27 @@
 import { writable } from 'svelte/store'
+import type { Writable } from 'svelte/store';
 import { fetchNui } from '../utils/eventHandler';
+import type { creatableObject, createdMessageData, deleteMessageData, loadMessageData, spawnObject } from '../types/types';
 
 interface propObjectStateType {
-  currentObject: string
-  currentType: string
-  isOpen: boolean
-  objectList: Array<{ value: string }>
-  objectTypes: Array<{ value: string }>
-  renderDistance: number
+  isOpen: Writable<boolean>
+  objectList: Writable<Array<{ value: string }>>
+  objectTypes: Writable<Array<{ value: string }>>
+  spawnedObjectList: Writable<Array<spawnObject>>
 }
 
 const store = () => {
 
   const propObjectState: propObjectStateType = {
-    currentObject: null,
-    currentType: null,
-    isOpen: false,
-    renderDistance: 15,
-    objectList: [],
-    objectTypes: [],
+    isOpen: writable(false),
+    objectList: writable([]),
+    objectTypes: writable([]),
+    spawnedObjectList: writable([]),
   };
-
-  const { subscribe, set, update } = writable(propObjectState);
 
   const methods = {
     closeMenu() {
-      update(state => {
-        state.isOpen = false;
-        return state;
-      });
+      propObjectState.isOpen.set(false);
       fetchNui('close');
     },
     handleKeyUp(data) {
@@ -37,14 +30,23 @@ const store = () => {
       }
     },
     receiveOpenMessage() {
-      update(state => {
-        state.isOpen = true;
-        return state;
-      });
+      propObjectState.isOpen.set(true);
     },
-    receiveLoadMessage(data) {
+    receiveCreatedMessage(data: createdMessageData) {
+      propObjectState.spawnedObjectList.update((list) => {
+        list = [...list, data.newSpawnedObject];
+        return list;
+      })
+    },
+    receiveDeleteMessage(data: deleteMessageData) {
+      propObjectState.spawnedObjectList.update((objectList) => {
+        return objectList.filter((item) => item.id != data.id);
+      })
+    },
+    receiveLoadMessage(data: loadMessageData) {
       let objects: Array<{ value: string }> = [];
       let objectTypes: Array<{ value: string }> = [];
+      let spawnedObjectList: Array<spawnObject> = [];
 
       for (const [key, value] of Object.entries(data.objects)) {
         if (value) {
@@ -55,49 +57,29 @@ const store = () => {
       for (const name of data.objectTypes) {
         objectTypes.push({ value: name as string });
       }
+
+      for (const item of Object.values(data.spawnedObjects)) {
+        spawnedObjectList.push(item);
+      }
       
-      update(state => {
-        state.objectList = objects;
-        state.objectTypes = objectTypes;
-        state.isOpen = true;
-        return state;
-      });
+      propObjectState.isOpen.set(true);
+      propObjectState.objectList.set(objects);
+      propObjectState.objectTypes.set(objectTypes);
+      propObjectState.spawnedObjectList.set(spawnedObjectList || []);
     },
-    setRenderDisable(value) {
-      update(state => {
-        state.renderDistance = value;
-        return state;
-      })
-    },
-    setObject(value) {
-      update(state => {
-        state.currentObject = value;
-        return state;
-      })
-    },
-    setObjectType(value) {
-      update(state => {
-        state.currentType = value;
-        return state;
-      })
-    },
-    spawnObject() {
-      update(state => {
-        fetchNui("spawn", {
-          object: state.currentObject,
-          type: state.currentType,
-          distance: state.renderDistance,
-        })
-        methods.closeMenu()
-        return state;
+    spawnObject(objectData: creatableObject) {
+      propObjectState.isOpen.set(false);
+      fetchNui("spawn", {
+        name: objectData.name,
+        object: objectData.object,
+        type: objectData.type,
+        distance: objectData.distance,
       })
     },
   };
 
   return {
-    subscribe,
-    set,
-    update,
+    ...propObjectState,
     ...methods
   }
 }
