@@ -15,6 +15,8 @@
     content: any
   }
 
+  let { isOpen } = ObjectStore;
+
   let tabArray: Array<tabType> = [
     { name: "Create", content: CreatePanel },
     { name: "Manage", content: ManagePanel },
@@ -26,19 +28,21 @@
   }
 </script>
 
-{#if $ObjectStore.isOpen || debug}
+{#if $isOpen || debug}
   <main class="min-h-screen flex justify-center items-center {debug ? "bg-dark-300":""}" transition:fade="{{duration: 200}}">
-    <div class="bg-dark-100 text-white w-[300px] p-5 text-lg rounded-lg shadow-xl my-auto font-semibold select-none">
+    <div class="bg-dark-100 text-white w-[820px] h-[550px] p-5 text-lg rounded-lg shadow-xl my-auto font-semibold select-none">
       <div class="flex flex-row gap-2 mb-5">
         {#each tabArray as tab, i}
           <Tab name={tab.name} on:click={() => handleClick(i)} active={tab.name == activeTab.name}/>
         {/each}
       </div>
-      {#each tabArray as tab}
-        {#if activeTab.name == tab.name }
-          <svelte:component this={tab.content}/>
-        {/if}
-      {/each}
+      <div class="flex flex-col">
+        {#each tabArray as tab}
+          {#if activeTab.name == tab.name }
+            <svelte:component this={tab.content}/>
+          {/if}
+        {/each}
+      </div>
     </div>
   </main>
 {/if}
