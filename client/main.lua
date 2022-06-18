@@ -42,13 +42,9 @@ end
 
 AddEventHandler('onResourceStart', function(resourceName)
     if GetCurrentResourceName() == resourceName then
-        QBCore.Functions.TriggerCallback('ps-objectspawner:server:RequestObjects', function(incObjectList)
-            ObjectList = incObjectList
-        end)
-
         QBCore.Functions.TriggerCallback('qb-afkkick:server:GetPermissions', function(UserGroup)
             group = UserGroup
-            if group and group['god'] then
+            if group and group['god'] or group == 'god' then
                 RegisterCommand('object', function()
                     openMenu()
                 end)
@@ -59,6 +55,9 @@ AddEventHandler('onResourceStart', function(resourceName)
         
                 RegisterKeyMapping("+CancelObject", "Cancel Placing Object", "keyboard", "")
             end
+        end)
+        QBCore.Functions.TriggerCallback('ps-objectspawner:server:RequestObjects', function(incObjectList)
+            ObjectList = incObjectList
         end)
     end
 end)
@@ -81,7 +80,7 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
 
     QBCore.Functions.TriggerCallback('qb-afkkick:server:GetPermissions', function(UserGroup)
         group = UserGroup
-        if group and group['god'] then
+        if group and group['god'] or group == 'god' then
             RegisterCommand('object', function()
                 openMenu()
             end)
@@ -343,7 +342,7 @@ end)
 
 RegisterNetEvent("ps-objectspawner:client:AddObject", function(object)
     ObjectList[object.id] = object
-    if group and group['god'] then
+    if group and group['god'] or group == 'god' then
         SendNUIMessage({ 
             action = "created",
             newSpawnedObject = object,
@@ -352,21 +351,21 @@ RegisterNetEvent("ps-objectspawner:client:AddObject", function(object)
 end)
 
 RegisterNUICallback('tpTo', function(data, cb)
-    if group and group['god'] then
-        SetEntityCoords(PlayerPedId(), data.coords.x, data.coords.y, data.coords.z)
+    if group and group['god'] or group == 'god' then
+        SetEntityCoords(PlayerPedId(), data.coords.x+1, data.coords.y+1, data.coords.z)
     end
     cb('ok')
 end)
 
 RegisterNUICallback('delete', function(data, cb)
-    if group and group['god'] then
+    if group and group['god'] or group == 'god' then
         TriggerServerEvent("ps-objectspawner:server:DeleteObject", data.id)
     end
     cb('ok')
 end)
 
 RegisterNetEvent('ps-objectspawner:client:receiveObjectDelete', function(id)
-    if group and group['god'] then
+    if group and group['god'] or group == 'god' then
         if ObjectList[id]["IsRendered"] then
             if DoesEntityExist(ObjectList[id]["object"]) then 
                 for i = 255, 0, -51 do
