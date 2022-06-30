@@ -10,6 +10,7 @@ A well thought out simplistic user-friendly experience for spawning objects arou
 * [qb-target](https://github.com/BerkieBb/qb-target)
 
 ### ⚠️Important:
+Write here if anything is important they need to know
 
 <br>
 <br>
@@ -45,16 +46,16 @@ Write here.
 ### Time to show you what it looks like!
 Here's a few showcased examples while using ps-objectspawner.
 
-#### Design mode and shapes:
+#### Feature title:
 Paste video or picture here
 
-#### Design mode and shapes:
+#### Feature title:
 Paste video or picture here
 
-#### Design mode and shapes:
+#### Feature title:
 Paste video or picture here
 
-#### Design mode and shapes:
+#### Feature title:
 Paste video or picture here
 
 ### Credits:
