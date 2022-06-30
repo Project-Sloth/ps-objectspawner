@@ -13,6 +13,7 @@ local ObjectTypes = {
 
 local ObjectParams = {
     ["container"] = {event = "ps-objectspawner:client:containers", icon = "fas fa-question", label = "Container", SpawnRange = 200},
+    ["none"] = {SpawnRange = 200},
 }
 
 --Functions
@@ -38,6 +39,16 @@ local function openMenu()
             spawnedObjects = tempList,
         })
     end
+end
+
+local function CancelPlacement()
+    DeleteObject(CurrentObject)
+    PlacingObject = false
+    CurrentObject = nil
+    CurrentObjectType = nil
+    CurrentObjectName = nil
+    CurrentSpawnRange = nil
+    CurrentCoords = nil
 end
 
 AddEventHandler('onResourceStart', function(resourceName)
@@ -252,17 +263,6 @@ local function CreateSpawnedObject(data)
     end)
 end
 
-local function CancelPlacement()
-    DeleteObject(CurrentObject)
-    SetNuiFocus(true, true)
-    PlacingObject = false
-    CurrentObject = nil
-    CurrentObjectType = nil
-    CurrentObjectName = nil
-    CurrentSpawnRange = nil
-    CurrentCoords = nil
-end
-
 RegisterNUICallback('close', function(data, cb)
     SetNuiFocus(false, false)
     cb('ok')
@@ -286,8 +286,8 @@ CreateThread(function()
             local objectCoords = v["coords"]
 			local playerCoords = GetEntityCoords(PlayerPedId())
 			local dist = #(playerCoords - vector3(objectCoords["x"], objectCoords["y"], objectCoords["z"]))
-
 			if dist < data["SpawnRange"] and v["IsRendered"] == nil then
+                
 				local object = CreateObject(v["model"], objectCoords["x"], objectCoords["y"], objectCoords["z"], true, false, false)
                 SetEntityHeading(object, objectCoords["w"])
                 SetEntityAlpha(object, 0)
@@ -304,21 +304,20 @@ CreateThread(function()
                     Wait(50)
                     SetEntityAlpha(v["object"], i, false)
                 end
-
                 if ObjectParams[v.type] ~= nil and ObjectParams[v.type].event ~= nil then
-                    exports.qtarget:AddTargetEntity(object, {
-                        --debugPoly=true,
-                        options = {
-                            {
-                                name = "object_spawner_"..object, 
-                                event = ObjectParams[v.type].event,
-                                icon = ObjectParams[v.type].icon,
-                                label = ObjectParams[v.type].label,
-                                id = v.id
-                            },
-                        },
-                        distance = ObjectParams[data.SpawnRange]
-                    })
+                    -- exports.qtarget:AddTargetEntity(object, {
+                    --     --debugPoly=true,
+                    --     options = {
+                    --         {
+                    --             name = "object_spawner_"..object, 
+                    --             event = ObjectParams[v.type].event,
+                    --             icon = ObjectParams[v.type].icon,
+                    --             label = ObjectParams[v.type].label,
+                    --             id = v.id
+                    --         },
+                    --     },
+                    --     distance = ObjectParams[data.SpawnRange]
+                    -- })
                 end
 			end
 			
