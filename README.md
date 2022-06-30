@@ -32,10 +32,10 @@ Write here.
 
 
 #### Some features to mention within this ps-objectspawner:
-* Write here
-* Write here
-* Write here
-* Write here
+* Spawn objects
+* Manage objects
+* Render distance for optimization
+* Teleport to objects placed
 
 <br>
 <br>
@@ -46,17 +46,17 @@ Write here.
 ### Time to show you what it looks like!
 Here's a few showcased examples while using ps-objectspawner.
 
-#### Feature title:
-Paste video or picture here
+#### Spawn object:
+![unknown (4)](https://user-images.githubusercontent.com/91661118/176781258-063b432c-4f71-40d5-baf8-f74d3d01f6a6.png)
 
-#### Feature title:
-Paste video or picture here
+#### Place object:
+![unknown (3)](https://user-images.githubusercontent.com/91661118/176781276-f33162bd-58d2-4ad9-977f-0da1ae03e758.png)
 
-#### Feature title:
-Paste video or picture here
+#### Manage objects:
+![unknown (5)](https://user-images.githubusercontent.com/91661118/176781300-d4f717c8-9b44-43ea-b609-6a3846cb8006.png)
 
-#### Feature title:
-Paste video or picture here
+#### Search for object:
+![unknown](https://user-images.githubusercontent.com/91661118/176781358-9907494d-2288-4b00-a15b-4d68620f707f.png)
 
 ### Credits:
 Inspiration and some code snippets from [Svelte & Lua Boilerplate](https://github.com/project-error/svelte-lua-boilerplate) by [Project Error](https://github.com/project-error)
