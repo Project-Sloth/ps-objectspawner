@@ -1,0 +1,13 @@
+lockfileVersion: 5.4
+
+specifiers:
+  '@neodrag/svelte': ^1.2.3
+
+dependencies:
+  '@neodrag/svelte': 1.2.3
+
+packages:
+
+  /@neodrag/svelte/1.2.3:
+    resolution: {integrity: sha512-+OMidMflSWLxPq0m0xyEozaqq5MPzFukZo6cEx4Hp/inHmuHjbDMfUkGDd/g+MpVFgzkqPDGrTS6JnXVGA2d9Q==}
+    dev: false

@@ -26,7 +26,7 @@
 </script>
 
 
-<div class="flex flex-col gap-5 text-center">
+<div class="flex flex-col gap-5 text-center mx-25">
   <div class="flex flex-col gap-1">
     <p class="text-xl font-bold">Name</p>
     <TextInput bind:value={currentName} placeholder="Object Name" maxLength={25}/>
