@@ -89,6 +89,7 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
         ObjectList = incObjectList
     end)
 
+    Wait(1500)
     QBCore.Functions.TriggerCallback('qb-afkkick:server:GetPermissions', function(UserGroup)
         group = UserGroup
         if group and group['god'] or group == 'god' then
@@ -305,19 +306,19 @@ CreateThread(function()
                     SetEntityAlpha(v["object"], i, false)
                 end
                 if ObjectParams[v.type] ~= nil and ObjectParams[v.type].event ~= nil then
-                    -- exports.qtarget:AddTargetEntity(object, {
-                    --     --debugPoly=true,
-                    --     options = {
-                    --         {
-                    --             name = "object_spawner_"..object, 
-                    --             event = ObjectParams[v.type].event,
-                    --             icon = ObjectParams[v.type].icon,
-                    --             label = ObjectParams[v.type].label,
-                    --             id = v.id
-                    --         },
-                    --     },
-                    --     distance = ObjectParams[data.SpawnRange]
-                    -- })
+                    exports['qb-target']:AddTargetEntity(object, {
+                        --debugPoly=true,
+                        options = {
+                            {
+                                name = "object_spawner_"..object, 
+                                event = ObjectParams[v.type].event,
+                                icon = ObjectParams[v.type].icon,
+                                label = ObjectParams[v.type].label,
+                                id = v.id
+                            },
+                        },
+                        distance = ObjectParams[data.SpawnRange]
+                    })
                 end
 			end
 			
