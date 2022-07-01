@@ -11,7 +11,7 @@ A well thought out simplistic user-friendly experience for spawning objects arou
 * [oxmysql](https://github.com/overextended/oxmysql)
 
 ### ⚠️Important:
-First, run the included sql file to create the `objects` table in your database. Also, this command will only work for players with `god` permissions.
+First, run the included sql file to create the `objects` table in your database. Also, the `/object` command will only work for players with `god` permissions, by default.
 
 <br>
 <br>
