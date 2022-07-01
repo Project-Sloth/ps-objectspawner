@@ -8,9 +8,10 @@ A well thought out simplistic user-friendly experience for spawning objects arou
 ### Dependencies:
 * [qb-core](https://github.com/qbcore-framework/qb-core)
 * [qb-target](https://github.com/BerkieBb/qb-target)
+* [oxmysql](https://github.com/overextended/oxmysql)
 
 ### ⚠️Important:
-Write here if anything is important they need to know
+First, run the included sql file to create the `objects` table in your database. Also, this command will only work for players with `god` permissions.
 
 <br>
 <br>
@@ -19,7 +20,7 @@ Write here if anything is important they need to know
 
 
 ### Start installing now
-We will now provide you with a step-by-step guide for the installation process. Shouldn't take too long and it shouldn't be too confusing either!
+After creation the `objects` table and ensuring you have the `god` permission, use the `/object` command open the spawning/management
 
 
 ### Step 1:
