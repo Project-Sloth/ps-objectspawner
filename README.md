@@ -19,14 +19,13 @@ First, run the included sql file to create the `objects` table in your database.
 ![Project Sloth GitHub Project PS-OBJECTSPAWNER Install Banner](https://user-images.githubusercontent.com/91661118/176777943-37417e7f-0f77-4afb-92ec-fb3fab2e6543.png)
 
 
-### Start installing now
-After creation the `objects` table and ensuring you have the `god` permission, use the `/object` command open the spawning/management
+### Instructions:
+After creation the `objects` table and ensuring you have the `god` permission, use the `/object` command open the spawning/management. In the Create menu, you can name and search for objects you would like to place in the world. You can also specify a spawning distance, that will determine when the object becomes visible to the player; this is specified in standard FiveM distance units. Finally, can add a type of target that the object will hold. We have provided an example (ex `container`) event/target that will create an inventory stash for the spawned object, but more can be added through the client code.
 
+In the Manage menu, you will see all the objects you have added and information about each. You can also teleport to the objects and delete them, if needed.
 
-### Step 1:
-Write here.
+Finally, the object hashes within the Search list are maintained in the included `objectlist` file.
 
-<br>
 <br>
 
 ![Project Sloth GitHub Project PS-OBJECTSPAWNER Features Banner](https://user-images.githubusercontent.com/91661118/176777942-becd37e0-3186-498f-ae00-ad5281bc2019.png)
