@@ -14,7 +14,6 @@ A well thought out simplistic user-friendly experience for spawning objects arou
 First, run the included sql file to create the `objects` table in your database. Also, the `/object` command will only work for players with `god` permissions, by default.
 
 <br>
-<br>
 
 ![Project Sloth GitHub Project PS-OBJECTSPAWNER Install Banner](https://user-images.githubusercontent.com/91661118/176777943-37417e7f-0f77-4afb-92ec-fb3fab2e6543.png)
 
