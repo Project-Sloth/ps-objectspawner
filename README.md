@@ -38,7 +38,6 @@ Finally, the object hashes within the Search list are maintained in the included
 * Teleport to objects placed
 
 <br>
-<br>
 
 ![Project Sloth GitHub Project PS-OBJECTSPAWNER Showcase Banner](https://user-images.githubusercontent.com/91661118/176777945-9f072499-f1d5-41d4-ac56-c06b5064ecc2.png)
 
