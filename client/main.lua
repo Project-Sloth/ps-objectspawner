@@ -67,6 +67,7 @@ AddEventHandler('onResourceStart', function(resourceName)
                 RegisterKeyMapping("+CancelObject", "Cancel Placing Object", "keyboard", "")
             end
         end)
+
         QBCore.Functions.TriggerCallback('ps-objectspawner:server:RequestObjects', function(incObjectList)
             ObjectList = incObjectList
         end)
@@ -305,19 +306,19 @@ CreateThread(function()
                     SetEntityAlpha(v["object"], i, false)
                 end
                 if ObjectParams[v.type] ~= nil and ObjectParams[v.type].event ~= nil then
-                    -- exports.qtarget:AddTargetEntity(object, {
-                    --     --debugPoly=true,
-                    --     options = {
-                    --         {
-                    --             name = "object_spawner_"..object, 
-                    --             event = ObjectParams[v.type].event,
-                    --             icon = ObjectParams[v.type].icon,
-                    --             label = ObjectParams[v.type].label,
-                    --             id = v.id
-                    --         },
-                    --     },
-                    --     distance = ObjectParams[data.SpawnRange]
-                    -- })
+                    exports["qb-target"]:AddTargetEntity(object, {
+                        --debugPoly=true,
+                        options = {
+                            {
+                                name = "object_spawner_"..object, 
+                                event = ObjectParams[v.type].event,
+                                icon = ObjectParams[v.type].icon,
+                                label = ObjectParams[v.type].label,
+                                id = v.id
+                            },
+                        },
+                        distance = ObjectParams[data.SpawnRange]
+                    })
                 end
 			end
 			
@@ -342,7 +343,7 @@ end)
 RegisterNetEvent("ps-objectspawner:client:AddObject", function(object)
     ObjectList[object.id] = object
     if group and group['god'] or group == 'god' then
-        SendNUIMessage({ 
+        SendNUIMessage({
             action = "created",
             newSpawnedObject = object,
         })
