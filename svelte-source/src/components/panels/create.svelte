@@ -7,17 +7,17 @@
 
   let { objectList, objectTypes } = ObjectStore;
 
-  let currentName: string;
-  let renderDistance: number;
-  let currentObject: string;
-  let currentType: string;
+  let currentName: string = "";
+  let renderDistance: number = 100;
+  let currentObject: string = "";
+  let currentType: string = "";
 
   function handleSpawnObjectClick() {
     ObjectStore.spawnObject({
       name: currentName, object: currentObject, type: currentType, distance: renderDistance
     });
     currentName = "";
-    renderDistance = 15;
+    renderDistance = 100;
     currentObject = "";
     currentType = "";
   }
@@ -37,7 +37,7 @@
   </div>
   <div class="flex flex-col gap-1">
     <p class="text-xl font-bold">Render Distance</p>
-    <NumberInput min={0} max={100} bind:value={renderDistance}/>
+    <NumberInput min={0} max={500} bind:value={renderDistance}/>
   </div>
   <div class="flex flex-col gap-1">
     <p class="text-xl font-bold">Select Object Type</p>

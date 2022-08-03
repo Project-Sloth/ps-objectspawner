@@ -59,15 +59,8 @@ AddEventHandler('onResourceStart', function(resourceName)
                 RegisterCommand('object', function()
                     openMenu()
                 end)
-        
-                RegisterCommand('+CancelObject', function()
-                    CancelPlacement()
-                end)
-        
-                RegisterKeyMapping("+CancelObject", "Cancel Placing Object", "keyboard", "")
             end
         end)
-
         QBCore.Functions.TriggerCallback('ps-objectspawner:server:RequestObjects', function(incObjectList)
             ObjectList = incObjectList
         end)
@@ -90,18 +83,13 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
         ObjectList = incObjectList
     end)
 
+    Wait(1500)
     QBCore.Functions.TriggerCallback('qb-afkkick:server:GetPermissions', function(UserGroup)
         group = UserGroup
         if group and group['god'] or group == 'god' then
             RegisterCommand('object', function()
                 openMenu()
             end)
-    
-            RegisterCommand('+CancelObject', function()
-                CancelPlacement()
-            end)
-    
-            RegisterKeyMapping("+CancelObject", "Cancel Placing Object", "keyboard", "")
         end
     end)
 end)
@@ -132,14 +120,21 @@ local function setupScaleform(scaleform)
     PushScaleformMovieFunctionParameterInt(200)
     PopScaleformMovieFunctionVoid()
 
+
     PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT")
     PushScaleformMovieFunctionParameterInt(0)
+    Button(GetControlInstructionalButton(2, 152, true))
+    ButtonMessage("Cancel")
+    PopScaleformMovieFunctionVoid()
+
+    PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT")
+    PushScaleformMovieFunctionParameterInt(1)
     Button(GetControlInstructionalButton(2, 153, true))
     ButtonMessage("Place object")
     PopScaleformMovieFunctionVoid()
 
     PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT")
-    PushScaleformMovieFunctionParameterInt(1)
+    PushScaleformMovieFunctionParameterInt(2)
     Button(GetControlInstructionalButton(2, 190, true))
     Button(GetControlInstructionalButton(2, 189, true))
     ButtonMessage("Rotate object")
@@ -252,7 +247,11 @@ local function CreateSpawnedObject(data)
             if IsControlJustPressed(0, 175) then
                 heading = heading - 5
                 if heading < 0 then heading = 360.0 end
-            end 
+            end
+            
+            if IsControlJustPressed(0, 44) then
+                CancelPlacement()
+            end
 
             SetEntityHeading(CurrentObject, heading)
             if IsControlJustPressed(0, 38) then
@@ -306,7 +305,7 @@ CreateThread(function()
                     SetEntityAlpha(v["object"], i, false)
                 end
                 if ObjectParams[v.type] ~= nil and ObjectParams[v.type].event ~= nil then
-                    exports["qb-target"]:AddTargetEntity(object, {
+                    exports['qb-target']:AddTargetEntity(object, {
                         --debugPoly=true,
                         options = {
                             {
@@ -343,7 +342,7 @@ end)
 RegisterNetEvent("ps-objectspawner:client:AddObject", function(object)
     ObjectList[object.id] = object
     if group and group['god'] or group == 'god' then
-        SendNUIMessage({
+        SendNUIMessage({ 
             action = "created",
             newSpawnedObject = object,
         })
