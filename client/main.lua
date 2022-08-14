@@ -288,7 +288,7 @@ CreateThread(function()
 			local dist = #(playerCoords - vector3(objectCoords["x"], objectCoords["y"], objectCoords["z"]))
 			if dist < data["SpawnRange"] and v["IsRendered"] == nil then
                 
-				local object = CreateObject(v["model"], objectCoords["x"], objectCoords["y"], objectCoords["z"], true, false, false)
+				local object = CreateObject(v["model"], objectCoords["x"], objectCoords["y"], objectCoords["z"], false, false, false)
                 SetEntityHeading(object, objectCoords["w"])
                 SetEntityAlpha(object, 0)
                 PlaceObjectOnGroundProperly(object)
