@@ -262,6 +262,7 @@ local function CreateSpawnedObject(data)
         end
     end)
 end
+exports("CreateSpawnedObject", CreateSpawnedObject)
 
 RegisterNUICallback('close', function(data, cb)
     SetNuiFocus(false, false)
