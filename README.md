@@ -12,6 +12,7 @@ A well thought out simplistic user-friendly experience for spawning objects arou
 
 ### ⚠️Important:
 First, run the included sql file to create the `objects` table in your database. Also, the `/object` command will only work for players with `god` permissions, by default.
+If you have no permission to use the object command. Go to admin menu > Player Management > Select Player > Permission > Set Group to God > Confirm. Try again entering this command.
 
 <br>
 
