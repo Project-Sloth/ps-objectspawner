@@ -55,10 +55,12 @@ AddEventHandler('onResourceStart', function(resourceName)
     if GetCurrentResourceName() == resourceName then
         QBCore.Functions.TriggerCallback('qb-afkkick:server:GetPermissions', function(UserGroup)
             group = UserGroup
-            if group and group['god'] or group == 'god' then
+            if group and (group['god'] or group == 'god') then
                 RegisterCommand('object', function()
                     openMenu()
                 end)
+            else
+                print("No permission to use the object command. Go to admin menu > Player Management > Select Player > Permission > Set Group to God > Confirm. Try again entering this command.")
             end
         end)
         QBCore.Functions.TriggerCallback('ps-objectspawner:server:RequestObjects', function(incObjectList)
@@ -66,6 +68,7 @@ AddEventHandler('onResourceStart', function(resourceName)
         end)
     end
 end)
+
 
 AddEventHandler('onResourceStop', function(resourceName)
     if GetCurrentResourceName() == resourceName then
