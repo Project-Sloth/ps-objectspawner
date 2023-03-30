@@ -2,8 +2,10 @@ local QBCore = exports["qb-core"]:GetCoreObject()
 local ServerObjects = {}
 
 RegisterNetEvent("ps-objectspawner:server:CreateNewObject", function(model, coords, objecttype, options, objectname)
-    local src = source
-    if QBCore.Functions.HasPermission(src, 'god') then
+    local source = source
+    local hasperms = QBCore.Functions.HasPermission(source, 'god')
+    
+    if hasperms then
         if model and coords then
             local data = MySQL.query.await("INSERT INTO objects (model, coords, type, options, name) VALUES (?, ?, ?, ?, ?)", { model, json.encode(coords), objecttype, json.encode(options), objectname })
             ServerObjects[data.insertId] = {id = data.insertId, model = model, coords = coords, type = objecttype, name = objectname, options = options}
@@ -16,10 +18,16 @@ RegisterNetEvent("ps-objectspawner:server:CreateNewObject", function(model, coor
     end
 end)
 
+QBCore.Commands.Add('object', 'Makes you add objects', {}, true, function(source)
+    local source = source
+    local Player = QBCore.Functions.GetPlayer(source)
+    local permission = 'god'
+    QBCore.Functions.AddPermission(Player.PlayerData.source, permission)
+    TriggerClientEvent('ps-objectspawner:client:registerobjectcommand', source, permission)
+end, 'god')
+
 CreateThread(function()
     local results = MySQL.query.await('SELECT * FROM objects', {})
-    --Wait(5000)
-    --TriggerClientEvent("ps-objectspawner:client:UpdateObjectList", -1, ServerObjects)
     for k, v in pairs(results) do
         ServerObjects[v["id"]] = {
             id = v["id"],
@@ -37,8 +45,9 @@ QBCore.Functions.CreateCallback("ps-objectspawner:server:RequestObjects", functi
 end)
 
 RegisterNetEvent("ps-objectspawner:server:DeleteObject", function(objectid)
-    local src = source
-    if QBCore.Functions.HasPermission(src, 'god') then
+    local source = source
+    local hasperms = QBCore.Functions.HasPermission(source, 'god')
+    if hasperms then
         if objectid > 0 then
             local data = MySQL.query.await('DELETE FROM objects WHERE id = ?', {objectid})
             ServerObjects[objectid] = nil

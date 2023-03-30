@@ -53,22 +53,20 @@ end
 
 AddEventHandler('onResourceStart', function(resourceName)
     if GetCurrentResourceName() == resourceName then
-        QBCore.Functions.TriggerCallback('qb-afkkick:server:GetPermissions', function(UserGroup)
-            group = UserGroup
-            if group and (group['god'] or group == 'god') then
-                RegisterCommand('object', function()
-                    openMenu()
-                end)
-            else
-                print("No permission to use the object command. Go to admin menu > Player Management > Select Player > Permission > Set Group to God > Confirm. Try again entering this command.")
-            end
-        end)
         QBCore.Functions.TriggerCallback('ps-objectspawner:server:RequestObjects', function(incObjectList)
             ObjectList = incObjectList
         end)
     end
 end)
 
+RegisterNetEvent('ps-objectspawner:client:registerobjectcommand', function(perms)
+    permission = perms
+    if permission == "god" then
+        openMenu()
+    else
+        QBCore.Functions.Notify("You do not have permission to use this command", "error")
+    end
+end)
 
 AddEventHandler('onResourceStop', function(resourceName)
     if GetCurrentResourceName() == resourceName then
@@ -85,16 +83,7 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     QBCore.Functions.TriggerCallback('ps-objectspawner:server:RequestObjects', function(incObjectList)
         ObjectList = incObjectList
     end)
-
     Wait(1500)
-    QBCore.Functions.TriggerCallback('qb-afkkick:server:GetPermissions', function(UserGroup)
-        group = UserGroup
-        if group and group['god'] or group == 'god' then
-            RegisterCommand('object', function()
-                openMenu()
-            end)
-        end
-    end)
 end)
 
 local function ButtonMessage(text)
@@ -345,7 +334,7 @@ end)
 
 RegisterNetEvent("ps-objectspawner:client:AddObject", function(object)
     ObjectList[object.id] = object
-    if group and group['god'] or group == 'god' then
+    if permission == 'god' then
         SendNUIMessage({ 
             action = "created",
             newSpawnedObject = object,
@@ -354,21 +343,21 @@ RegisterNetEvent("ps-objectspawner:client:AddObject", function(object)
 end)
 
 RegisterNUICallback('tpTo', function(data, cb)
-    if group and group['god'] or group == 'god' then
+    if permission == 'god' then
         SetEntityCoords(PlayerPedId(), data.coords.x+1, data.coords.y+1, data.coords.z)
     end
     cb('ok')
 end)
 
 RegisterNUICallback('delete', function(data, cb)
-    if group and group['god'] or group == 'god' then
+    if permission == 'god' then
         TriggerServerEvent("ps-objectspawner:server:DeleteObject", data.id)
     end
     cb('ok')
 end)
 
 RegisterNetEvent('ps-objectspawner:client:receiveObjectDelete', function(id)
-    if group and group['god'] or group == 'god' then
+    if permission == 'god' then
         if ObjectList[id]["IsRendered"] then
             if DoesEntityExist(ObjectList[id]["object"]) then 
                 for i = 255, 0, -51 do
