@@ -1,3 +1,9 @@
+# Archiving Older Repos (Focus on ps-mdt v3)
+
+To help streamline things a bit around here (for the little work we actually do 😅), I’m going to be archiving the repos listed below. This doesn’t mean they’re broken or unusable, it just means we won’t be pushing any further updates to them for now.
+
+Our main focus moving forward will be ps-mdt v3 and its dependencies.
+
 ![Project Sloth GitHub Project PS-OBJECTSPAWNER Banner](https://user-images.githubusercontent.com/91661118/176777941-9f3dfa83-0da6-47e4-8cc9-5add55e198bc.png)
 
 ### ps-objectspawner
